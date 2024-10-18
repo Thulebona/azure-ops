@@ -1,0 +1,61 @@
+trigger:
+  - main
+
+resources:
+  - repo: self
+
+pool: numbus
+
+name: 0.$(Year:yyyy).$(Build.BuildId)
+
+variables:
+  DOCKER_FILE_PATH: "./"
+  JDK_VERSION: "19.0.2-al2"
+  IMAGE_NAME: 'Test'
+  HADOLINT_IMAGE: 'hadolint/hadolint:v2.12.0-debian'
+
+stages:
+  - stage: lint
+    displayName: lint
+    jobs:
+      - job: hadolint
+        displayName: hadolint
+        steps:
+          - task: Bash@3
+            displayName: hadolint
+            inputs:
+              targetType: inline
+              script: |
+                docker run --rm -i -v $(Build.SourcesDirectory):/workspace $(HADOLINT_IMAGE) hadolint /workspace/Dockerfile
+              workingDirectory: '$(Build.SourcesDirectory)'
+
+  - stage: build
+    displayName: build
+    jobs:
+      - job: build
+        displayName: build
+        steps:
+          - task: Bash@3
+            displayName: git-short-sha
+            inputs:
+              targetType: inline
+              script: |
+                set -euxo pipefail
+                GIT_COMMIT_SHORT_SHA=$(git rev-parse --short HEAD)
+                echo "##vso[task.setvariable variable=GIT_COMMIT_SHORT_SHA;]$GIT_COMMIT_SHORT_SHA"
+              workingDirectory: '$(Build.SourcesDirectory)'
+          - task: Bash@3
+            displayName: build
+            inputs:
+              targetType: inline
+              script: |
+                set -euxo pipefail
+                mkdir -p ~/.docker
+                echo "{\"credsStore\":\"ecr-login\"}" > ~/.docker/config.json
+                docker build \
+                  --build-arg JDK_VERSION=$(JDK_VERSION) \
+                  -f "$(Build.SourcesDirectory)/Dockerfile" \
+                  -t "$(ECR_ENDPOINT)/$(IMAGE_NAME):$(JDK_VERSION)-$(GIT_COMMIT_SHORT_SHA)" \
+                  .
+                docker push "$(ECR_ENDPOINT)/$(IMAGE_NAME):$(JDK_VERSION)-$(GIT_COMMIT_SHORT_SHA)"
+              workingDirectory: '$(Build.SourcesDirectory)'
