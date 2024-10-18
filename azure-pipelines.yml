@@ -10,7 +10,7 @@ name: 0.$(Year:yyyy).$(Build.BuildId)
 
 variables:
   DOCKER_FILE_PATH: "./"
-  JDK_VERSION: "19.0.2-al2"
+  JDK_VERSIONS: '19.0.2-al2,21.0.5-al2'
   IMAGE_NAME: 'Test'
   HADOLINT_IMAGE: 'hadolint/hadolint:v2.12.0-debian'
 
@@ -32,8 +32,11 @@ stages:
   - stage: build
     displayName: build
     jobs:
-      - job: build
-        displayName: build
+      - ${{ each jdk_version in split(variables.JDK_VERSIONS,',') }}:
+        - job: build with ${{ jdk_version }}
+        displayName: build for JDK_VERSION ${{ jdk_version }}
+        variables:
+          JDK_VERSION: '${{ jdk_version }}'
         steps:
           - task: Bash@3
             displayName: git-short-sha
@@ -57,5 +60,4 @@ stages:
                   -f "$(Build.SourcesDirectory)/Dockerfile" \
                   -t "$(ECR_ENDPOINT)/$(IMAGE_NAME):$(JDK_VERSION)-$(GIT_COMMIT_SHORT_SHA)" \
                   .
-                docker push "$(ECR_ENDPOINT)/$(IMAGE_NAME):$(JDK_VERSION)-$(GIT_COMMIT_SHORT_SHA)"
               workingDirectory: '$(Build.SourcesDirectory)'
