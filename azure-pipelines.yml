@@ -35,10 +35,10 @@ stages:
     displayName: build
     jobs:
       - ${{ each jdk_version in split(variables.JDK_VERSIONS,',') }}:
-        - job: build_jdk_${{ replace(replace(jdk_version, '-', '_'), '.', '_') }}
-          displayName: build for JDK_VERSION '${{ replace(replace(jdk_version, '-', '_'), '.', '_') }}
+        - job: build_jdk_${{ jdk_version }}
+          displayName: build for JDK_VERSION ${{ jdk_version }}
           variables:
-            JDK_VERSION: '${{ jdk_version }}'
+            JDK_VERSION: ${{ jdk_version }}
             ${{ if startsWith(jdk_version, '19') }}:
                DD_AGENT_VERSION: '$(DD_AGENT_VERSION_JAVA19)'
             ${{ else }}:
