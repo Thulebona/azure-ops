@@ -33,8 +33,8 @@ stages:
     displayName: build
     jobs:
       - ${{ each jdk_version in split(variables.JDK_VERSIONS,',') }}:
-        - job: build with '${{ jdk_version }}'
-          displayName: build for JDK_VERSION '${{ jdk_version }}'
+        - job: build with ${{ replace(replace(jdk_version, '-', '_'), '.', '_') }}
+          displayName: build for JDK_VERSION '${{ replace(replace(jdk_version, '-', '_'), '.', '_') }}
           variables:
             JDK_VERSION: '${{ jdk_version }}'
           steps:
@@ -53,8 +53,6 @@ stages:
                 targetType: inline
                 script: |
                   set -euxo pipefail
-                  mkdir -p ~/.docker
-                  echo "{\"credsStore\":\"ecr-login\"}" > ~/.docker/config.json
                   docker build \
                     --build-arg JDK_VERSION=$(JDK_VERSION) \
                     -f "$(Build.SourcesDirectory)/Dockerfile" \
