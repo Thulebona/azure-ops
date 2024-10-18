@@ -33,7 +33,7 @@ stages:
     displayName: build
     jobs:
       - ${{ each jdk_version in split(variables.JDK_VERSIONS,',') }}:
-        - job: build with ${{ replace(replace(jdk_version, '-', '_'), '.', '_') }}
+        - job: build_jdk_${{ replace(replace(jdk_version, '-', '_'), '.', '_') }}
           displayName: build for JDK_VERSION '${{ replace(replace(jdk_version, '-', '_'), '.', '_') }}
           variables:
             JDK_VERSION: '${{ jdk_version }}'
