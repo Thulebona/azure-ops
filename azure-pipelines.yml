@@ -4,7 +4,7 @@ trigger:
 resources:
   - repo: self
 
-pool: numbus
+pool: nimbus
 
 name: 0.$(Year:yyyy).$(Build.BuildId)
 
