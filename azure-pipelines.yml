@@ -35,7 +35,7 @@ stages:
     displayName: build
     jobs:
       - ${{ each jdk_version in split(variables.JDK_VERSIONS,',') }}:
-        - job: build_jdk_${{ jdk_version }}
+        - job: build_jdk
           displayName: build for JDK_VERSION ${{ jdk_version }}
           variables:
             JDK_VERSION: ${{ jdk_version }}
