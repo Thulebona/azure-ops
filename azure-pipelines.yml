@@ -16,13 +16,14 @@ variables:
   IMAGE_NAME: 'Test'
   HADOLINT_IMAGE: 'hadolint/hadolint:v2.12.0-debian'
 
-JDK_VERSIONS:
-  - name: 'java_19'
-    version: '19.0.2-al2'
-    dd_jar_version: 1.27.0
-  - name: 'java_21'
-    version: '21.0.5-al2'
-    dd_jar_version: '1.41.0'
+parameters:
+  JDK_VERSIONS:
+    - name: 'java_19'
+      version: '19.0.2-al2'
+      dd_jar_version: 1.27.0
+    - name: 'java_21'
+      version: '21.0.5-al2'
+      dd_jar_version: '1.41.0'
 
 stages:
   # - stage: lint
