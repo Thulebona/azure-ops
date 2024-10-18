@@ -4,7 +4,8 @@ trigger:
 resources:
   - repo: self
 
-pool: nimbus-mac
+pool:
+  vmImage: ubuntu-latest
 
 name: 0.$(Year:yyyy).$(Build.BuildId)
 
