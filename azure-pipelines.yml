@@ -4,7 +4,7 @@ trigger:
 resources:
   - repo: self
 
-pool: nimbus-mac
+pool: Default
 
 name: 0.$(Year:yyyy).$(Build.BuildId)
 
