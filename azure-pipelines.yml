@@ -24,10 +24,6 @@ stages:
             displayName: build with JDK ${{ jdk_version }}
             variables:
               JDK_VERSION: ${{ jdk_version }}
-#              ${{ if startsWith(jdk_version, '19') }}:
-#                DD_AGENT_VERSION: '$(DD_AGENT_VERSION_JAVA19)'
-#              ${{ else }}:
-#                DD_AGENT_VERSION: '$(DD_AGENT_VERSION_JAVA21)'
             steps:
               - task: Bash@3
                 displayName: git-short-sha
@@ -38,15 +34,22 @@ stages:
                     GIT_COMMIT_SHORT_SHA=$(git rev-parse --short HEAD)
                     echo "##vso[task.setvariable variable=GIT_COMMIT_SHORT_SHA;]$GIT_COMMIT_SHORT_SHA"
                 workingDirectory: '$(Build.SourcesDirectory)'
+
               - task: Bash@3
                 displayName: build with JDK ${{ jdk_version }}
                 inputs:
                   targetType: inline
                   script: |
                     set -euxo pipefail
+                    if [[ ${{ jdk_version }} == 19* ]]; then
+                      DD_AGENT_VERSION='$(DD_AGENT_VERSION_JAVA19)'
+                    else
+                      DD_AGENT_VERSION='$(DD_AGENT_VERSION_JAVA21)'
+                    fi
+
                     docker build \
                       --build-arg JDK_VERSION=$(JDK_VERSION) \
-                      --build-arg DD_AGENT_VERSION=$(DD_AGENT_VERSION) \
+                      --build-arg DD_AGENT_VERSION=$DD_AGENT_VERSION \
                       -f "$(Build.SourcesDirectory)/Dockerfile" \
                       -t "$(IMAGE_NAME):$(JDK_VERSION)-$(GIT_COMMIT_SHORT_SHA)" \
                       .
