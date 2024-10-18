@@ -69,6 +69,7 @@ stages:
                   set -euxo pipefail
                   docker build \
                     --build-arg JDK_VERSION=$(JDK_VERSION) \
+                    --build-arg DD_AGENT_VERSION=$(DD_AGENT_VERSION) \
                     -f "$(Build.SourcesDirectory)/Dockerfile" \
                     -t "$(IMAGE_NAME):$(JDK_VERSION)-$(GIT_COMMIT_SHORT_SHA)" \
                     .
