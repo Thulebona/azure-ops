@@ -10,18 +10,19 @@ name: 0.$(Year:yyyy).$(Build.BuildId)
 
 variables:
   DOCKER_FILE_PATH: "./"
-  JDK_VERSIONS: |
-    - name: 'java_19'
-      version: '19.0.2-al2'
-      dd_jar_version: 1.27.0
-    - name: 'java_21'
-      version: '21.0.5-al2'
-      dd_jar_version: '1.41.0'
+
   DD_AGENT_VERSION_JAVA19: '1.27.0'
   DD_AGENT_VERSION_JAVA21: '1.41.0'
   IMAGE_NAME: 'Test'
   HADOLINT_IMAGE: 'hadolint/hadolint:v2.12.0-debian'
 
+JDK_VERSIONS:
+  - name: 'java_19'
+    version: '19.0.2-al2'
+    dd_jar_version: 1.27.0
+  - name: 'java_21'
+    version: '21.0.5-al2'
+    dd_jar_version: '1.41.0'
 
 stages:
   # - stage: lint
@@ -41,7 +42,7 @@ stages:
   - stage: build
     displayName: build
     jobs:
-      - ${{ each jdk in variables.JDK_VERSIONS }}:
+      - ${{ each jdk in parameters.JDK_VERSIONS }}:
         - job: build_jdk_${{ jdk.name }}
           displayName: build for JDK_VERSION ${{ jdk.name }}
           variables:
