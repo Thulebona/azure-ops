@@ -10,7 +10,13 @@ name: 0.$(Year:yyyy).$(Build.BuildId)
 
 variables:
   DOCKER_FILE_PATH: "./"
-  JDK_VERSIONS: '19.0.2-al2,21.0.5-al2'
+  JDK_VERSIONS:
+    - name: 'java_19'
+      version: '19.0.2-al2'
+      dd_jar_version: 1.27.0
+    - name: 'java_21'
+      version: '21.0.5-al2'
+      dd_jar_version: '1.41.0'
   DD_AGENT_VERSION_JAVA19: '1.27.0'
   DD_AGENT_VERSION_JAVA21: '1.41.0'
   IMAGE_NAME: 'Test'
@@ -34,15 +40,12 @@ stages:
   - stage: build
     displayName: build
     jobs:
-      - ${{ each jdk_version in split(variables.JDK_VERSIONS,',') }}:
-        - job: build_jdk_${{ substring(jdk_version, 0,2) }}
-          displayName: build for JDK_VERSION ${{ jdk_version }}
+      - ${{ each jdk in split(variables.JDK_VERSIONS,',') }}:
+        - job: build_jdk_${{ jdk.name }}
+          displayName: build for JDK_VERSION ${{ jdk.name }}
           variables:
-            JDK_VERSION: ${{ jdk_version }}
-            ${{ if startsWith(jdk_version, '19') }}:
-               DD_AGENT_VERSION: '$(DD_AGENT_VERSION_JAVA19)'
-            ${{ else }}:
-               DD_AGENT_VERSION: '$(DD_AGENT_VERSION_JAVA21)'
+            JDK_VERSION: ${{ jdk.version }}
+            DD_AGENT_VERSION: ${{ jdk.dd_jar_version }}
           steps:
             - task: Bash@3
               displayName: git-short-sha
