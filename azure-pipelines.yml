@@ -14,7 +14,7 @@ parameters:
     default:
       - name: 'JAVA_19'
         version: '19.0.2-al2'
-        dd_jar_version: 1.27.0
+        dd_jar_version: '1.27.0'
       - name: 'JAVA_21'
         version: '21.0.5-al2'
         dd_jar_version: '1.41.0'
@@ -45,7 +45,7 @@ stages:
   - stage: build
     displayName: build
     jobs:
-      - ${{ each jdk in split(variables.JAVA_JDK_LIST) }}:
+      - ${{ each jdk in split(variables.JAVA_JDK_LIST, ',') }}:
         - job: build_${{ jdk.name }}
           displayName: build for JDK_VERSION ${{ jdk.version }}
           variables:
