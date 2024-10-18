@@ -46,8 +46,8 @@ stages:
     displayName: build
     jobs:
       - ${{ each jdk in parameters.java_lists }}:
-        - job: build_jdk_${{ jdk.name }}
-          displayName: build for JDK_VERSION ${{ jdk.name }}
+        - job: build_${{ jdk.name }}
+          displayName: build for JDK_VERSION ${{ jdk.version }}
           variables:
             JDK_VERSION: ${{ jdk.version }}
             DD_AGENT_VERSION: ${{ jdk.dd_jar_version }}
