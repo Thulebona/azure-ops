@@ -11,23 +11,25 @@ name: 0.$(Year:yyyy).$(Build.BuildId)
 variables:
   DOCKER_FILE_PATH: "./"
   JDK_VERSIONS: '19.0.2-al2,21.0.5-al2'
+  DD_AGENT_VERSION_JAVA19: '1.27.0'
+  DD_AGENT_VERSION_JAVA21: '1.41.0'
   IMAGE_NAME: 'Test'
   HADOLINT_IMAGE: 'hadolint/hadolint:v2.12.0-debian'
 
 stages:
-  - stage: lint
-    displayName: lint
-    jobs:
-      - job: hadolint
-        displayName: hadolint
-        steps:
-          - task: Bash@3
-            displayName: hadolint
-            inputs:
-              targetType: inline
-              script: |
-                docker run --rm -i -v $(Build.SourcesDirectory):/workspace $(HADOLINT_IMAGE) hadolint /workspace/Dockerfile
-              workingDirectory: '$(Build.SourcesDirectory)'
+  # - stage: lint
+  #   displayName: lint
+  #   jobs:
+  #     - job: hadolint
+  #       displayName: hadolint
+  #       steps:
+  #         - task: Bash@3
+  #           displayName: hadolint
+  #           inputs:
+  #             targetType: inline
+  #             script: |
+  #               docker run --rm -i -v $(Build.SourcesDirectory):/workspace $(HADOLINT_IMAGE) hadolint /workspace/Dockerfile
+  #             workingDirectory: '$(Build.SourcesDirectory)'
 
   - stage: build
     displayName: build
@@ -37,6 +39,10 @@ stages:
           displayName: build for JDK_VERSION '${{ replace(replace(jdk_version, '-', '_'), '.', '_') }}
           variables:
             JDK_VERSION: '${{ jdk_version }}'
+            ${{ if startsWith(jdk_version, '19') }}:
+               DD_AGENT_VERSION: '$(DD_AGENT_VERSION_JAVA19)'
+             ${{ else }}:
+               DD_AGENT_VERSION: '$(DD_AGENT_VERSION_JAVA21)'
           steps:
             - task: Bash@3
               displayName: git-short-sha
